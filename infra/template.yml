@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 
-Description: Cria uma VPC e duas subnets privadas
+Description: Creates a VPC and two private subnets
 
 Parameters:
   
