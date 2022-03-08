@@ -3,17 +3,15 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Creates a VPC and two private subnets
 
 Parameters:
-  
   VPCName:
     Type: String
     Default: VPCPrivate
-  
+
   Owner:
     Type: String
     Default: tg
 
 Mappings:
-
   SubnetConfig:
     VPC:
       CIDR: 10.0.0.0/16
@@ -21,20 +19,19 @@ Mappings:
       CIDR: 10.0.2.0/24
     Private2:
       CIDR: 10.0.3.0/24
-  
+
   AZRegions:
     us-east-2:
-      AZs: [ a, b ]
+      AZs: [a, b]
 
 Resources:
-
   VPC:
     Type: AWS::EC2::VPC
     Properties:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       CidrBlock:
-        Fn::FindInMap: [ SubnetConfig, VPC, CIDR ]
+        Fn::FindInMap: [SubnetConfig, VPC, CIDR]
       Tags:
         - Key: Name
           Value: !Ref VPCName
@@ -46,13 +43,25 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       AvailabilityZone:
-        Fn::Sub: [ "${AWS::Region}${AZ}", AZ: !Select [ 0, !FindInMap [ AZRegions, !Ref AWS::Region, AZs ] ] ]
+        Fn::Sub:
+          [
+            "${AWS::Region}${AZ}",
+            AZ: !Select [0, !FindInMap [AZRegions, !Ref AWS::Region, AZs]],
+          ]
       CidrBlock:
-        Fn::FindInMap: [ SubnetConfig, Private1, CIDR ]
+        Fn::FindInMap: [SubnetConfig, Private1, CIDR]
       Tags:
-        - Key: Name  
+        - Key: Name
           Value:
-            Fn::Join: [ '', [ !Ref VPCName, "-Private-", !Select [ 0, !FindInMap [ AZRegions, !Ref AWS::Region, AZs ] ] ] ]
+            Fn::Join:
+              [
+                "",
+                [
+                  !Ref VPCName,
+                  "-Private-",
+                  !Select [0, !FindInMap [AZRegions, !Ref AWS::Region, AZs]],
+                ],
+              ]
         - Key: Network
           Value: Private
         - Key: Owner
@@ -63,13 +72,25 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       AvailabilityZone:
-        Fn::Sub: [ "${AWS::Region}${AZ}", AZ: !Select [ 1, !FindInMap [ AZRegions, !Ref AWS::Region, AZs ] ] ]
+        Fn::Sub:
+          [
+            "${AWS::Region}${AZ}",
+            AZ: !Select [1, !FindInMap [AZRegions, !Ref AWS::Region, AZs]],
+          ]
       CidrBlock:
-        Fn::FindInMap: [ SubnetConfig, Private2, CIDR ]
+        Fn::FindInMap: [SubnetConfig, Private2, CIDR]
       Tags:
-        - Key: Name  
+        - Key: Name
           Value:
-            Fn::Join: [ '', [ !Ref VPCName, "-Private-", !Select [ 1, !FindInMap [ AZRegions, !Ref AWS::Region, AZs ] ] ] ]
+            Fn::Join:
+              [
+                "",
+                [
+                  !Ref VPCName,
+                  "-Private-",
+                  !Select [1, !FindInMap [AZRegions, !Ref AWS::Region, AZs]],
+                ],
+              ]
         - Key: Network
           Value: Private
         - Key: Owner
@@ -80,9 +101,9 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       Tags:
-        - Key: Name  
+        - Key: Name
           Value:
-            Fn::Join: [ '', [ !Ref VPCName, "PrivateRouteTable1" ] ]
+            Fn::Join: ["", [!Ref VPCName, "PrivateRouteTable1"]]
         - Key: Owner
           Value: !Ref Owner
 
@@ -91,12 +112,12 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       Tags:
-        - Key: Name  
+        - Key: Name
           Value:
-            Fn::Join: [ '', [ !Ref VPCName, "PrivateRouteTable2" ] ]
+            Fn::Join: ["", [!Ref VPCName, "PrivateRouteTable2"]]
         - Key: Owner
           Value: !Ref Owner
-  
+
   PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -110,7 +131,6 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable2
 
 Outputs:
-
   VPCId:
     Value: !Ref VPC
     Export:
